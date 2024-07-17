@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-// import { authenticate } from "@/app/login/actions";
+import React, { useState,useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -15,31 +13,29 @@ import {
   CircularProgress,
   Link as MuiLink,
 } from "@mui/material";
-// import { getMessageFromCode } from "@/lib/utils";
 
 export default function LoginForm() {
-  const router = useRouter();
-  //   const [result, dispatch] = useFormState(authenticate, undefined);
+  const { login, loading, error,resetError } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  //   useEffect(() => {
-  //     if (result) {
-  //       if (result.type === "error") {
-  //         toast.error(getMessageFromCode(result.resultCode));
-  //       } else {
-  //         toast.success(getMessageFromCode(result.resultCode));
-  //         router.refresh();
-  //       }
-  //     }
-  //   }, [result, router]);
+  useEffect(() => {
+    resetError();
+  }, []);
 
-  const onSubmit = () => {};
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    await login(email, password);
+    if (error) {
+      toast.error(error);
+    } else {
+      toast.success("Login successful!");
+    }
+  };
+
   return (
-    <Container
-      className="h-screen flex flex-col justify-center items-center gap-4 "
-      maxWidth="sm"
-    >
-      {/* onSubmit={dispatch} */}
-      <form action={onSubmit} className="">
+    <Container className="h-screen flex flex-col justify-center items-center gap-4" maxWidth="sm">
+      <form onSubmit={onSubmit} className="">
         <Box
           sx={{
             width: "100%",
@@ -52,6 +48,11 @@ export default function LoginForm() {
           <Typography variant="h5" component="h1" gutterBottom>
             Please log in to continue.
           </Typography>
+          {error && (
+            <Typography variant="body2" color="error">
+              {error}
+            </Typography>
+          )}
           <TextField
             fullWidth
             margin="normal"
@@ -62,6 +63,8 @@ export default function LoginForm() {
             placeholder="Enter your email address"
             required
             variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
             fullWidth
@@ -74,18 +77,16 @@ export default function LoginForm() {
             required
             variant="outlined"
             inputProps={{ minLength: 6 }}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <LoginButton />
+          <LoginButton loading={loading} />
         </Box>
 
         <MuiLink component={Link} href="/signup" underline="none">
           <Typography variant="body2" color="textSecondary">
             No account yet?{" "}
-            <Typography
-              component="span"
-              fontWeight="fontWeightBold"
-              sx={{ textDecoration: "underline" }}
-            >
+            <Typography component="span" fontWeight="fontWeightBold" sx={{ textDecoration: "underline" }}>
               Sign up
             </Typography>
           </Typography>
@@ -95,20 +96,10 @@ export default function LoginForm() {
   );
 }
 
-function LoginButton() {
-  //   const { pending } = useFormStatus();
-
+function LoginButton({ loading }) {
   return (
-    <Button
-      type="submit"
-      fullWidth
-      variant="contained"
-      color="primary"
-      //   disabled={pending}
-      sx={{ mt: 3, mb: 2 }}
-    >
-      {/* {pending ? <CircularProgress size={24} /> : "Log in"} */}
-      Log in
+    <Button type="submit" fullWidth variant="contained" color="primary" disabled={loading} sx={{ mt: 3, mb: 2 }}>
+      {loading ? <CircularProgress size={24} /> : "Log in"}
     </Button>
   );
 }

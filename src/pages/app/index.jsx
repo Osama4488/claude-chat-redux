@@ -1,55 +1,71 @@
-"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-
-import { toast } from "sonner";
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-} from "@mui/material";
+import axios from "axios";
+import { Container, Box } from "@mui/material";
 import ChatPanel from "../../components/chat-panel";
-import Link from "next/link";
 import Header from "../../layout/header";
 
 export default function Chat({ id, className, session, missingKeys }) {
   const router = useRouter();
   const path = usePathname();
   const [input, setInput] = useState("");
-  //   const [_, setNewChatId] = useLocalStorage("newChatId", id);
+  const [responseStream, setResponseStream] = useState([]); // State to store streamed responses
+  const [sendingMessage, setSendingMessage] = useState(false); // State for sending message loader
 
-  //   useEffect(() => {
-  //     setNewChatId(id);
-  //   });
+  const fetchResponse = async () => {
+    try {
+      setSendingMessage(true); // Start loader
+      const apiUrl = `https://junaid121e2e-001-site1.ctempurl.com/api/ResponseGeneration/StreamTextResponseGenerator?str=${encodeURIComponent(
+        input
+      )}`;
+      const response = await axios.get(apiUrl);
+      console.log(response,"response")
+      setResponseStream(prevStream => [...prevStream, response.data.results]); // Append new response to stream
+    } catch (error) {
+      console.error("Error fetching response:", error);
+      // Handle error state if needed
+    } finally {
+      setSendingMessage(false); // Stop loader
+    }
+  };
 
-  //   useEffect(() => {
-  //     missingKeys.map((key) => {
-  //       toast.error(`Missing ${key} environment variable!`);
-  //     });
-  //   }, [missingKeys]);
+  const handleSend = () => {
+    // Call API to fetch response when sending a message
+    fetchResponse();
+    setInput(""); // Clear input after sending
+  };
 
   return (
     <>
       <Header />
-      <Container
-        //   maxWidth="lg"
-        className="group w-full overflow-auto flex justify-center"
-      >
+      <Container className="group w-full overflow-auto ">
         <Box
           sx={{
             pb: "200px",
             pt: { xs: 4, md: 10 },
             ...(className ? { className } : {}),
           }}
+          className="flex flex-col justify-between"
         >
-          <EmptyScreen />
+          {responseStream.length > 0 ? (
+            responseStream.map((response, index) => (
+              <div key={index}>{response}</div>
+            ))
+          ) : (
+            <EmptyScreen />
+          )}
           <Box sx={{ width: "100%", height: "1px" }} />
+
+          <ChatPanel
+            id={id}
+            input={input}
+            setInput={setInput}
+            handleSend={handleSend}
+            sendingMessage={sendingMessage} // Pass sendingMessage state to ChatPanel
+          />
+
         </Box>
-        <ChatPanel id={id} input={input} setInput={setInput} />
       </Container>
     </>
   );
@@ -64,15 +80,15 @@ function EmptyScreen() {
         </h1>
         <p className="leading-normal text-muted-foreground">
           This is an open source AI chatbot app template built with{" "}
-          <Link href="https://nextjs.org">Next.js</Link>, the{" "}
-          <Link href="https://sdk.vercel.ai">Vercel AI SDK</Link>, and{" "}
-          <Link href="https://vercel.com/storage/kv">Vercel KV</Link>.
+          <a href="https://nextjs.org">Next.js</a>, the{" "}
+          <a href="https://sdk.vercel.ai">Vercel AI SDK</a>, and{" "}
+          <a href="https://vercel.com/storage/kv">Vercel KV</a>.
         </p>
         <p className="leading-normal text-muted-foreground">
           It uses{" "}
-          <Link href="https://vercel.com/blog/ai-sdk-3-generative-ui">
+          <a href="https://vercel.com/blog/ai-sdk-3-generative-ui">
             React Server Components
-          </Link>{" "}
+          </a>{" "}
           to combine text with generative UI as output of the LLM. The UI state
           is synced through the SDK so the model is aware of your interactions
           as they happen.
@@ -81,47 +97,3 @@ function EmptyScreen() {
     </div>
   );
 }
-
-// function ChatPanel({ id, input, setInput, isAtBottom, scrollToBottom }) {
-//   const handleInputChange = (e) => setInput(e.target.value);
-//   const handleSend = () => {
-//     // Placeholder for send functionality
-//     console.log("Sending message:", input);
-//     setInput("");
-//   };
-
-//   return (
-//     <Box
-//       sx={{
-//         position: "fixed",
-//         bottom: 0,
-//         // width: "100%",
-//         width: "1200px",
-//         marginBottom: "20px",
-//         bgcolor: "background.paper",
-//         p: 2,
-//         boxShadow: 3,
-//       }}
-//     >
-//       <TextField
-//         fullWidth
-//         value={input}
-//         onChange={handleInputChange}
-//         placeholder="Type your message..."
-//         variant="outlined"
-//         InputProps={{
-//           endAdornment: (
-//             <Button variant="contained" color="primary" onClick={handleSend}>
-//               Send
-//             </Button>
-//           ),
-//         }}
-//       />
-//       {/* {isAtBottom ? null : (
-//         <Button variant="outlined" onClick={scrollToBottom} sx={{ mt: 2 }}>
-//           Scroll to Bottom
-//         </Button>
-//       )} */}
-//     </Box>
-//   );
-// }

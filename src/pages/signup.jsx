@@ -1,29 +1,47 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState,useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+
 import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
   Container,
   TextField,
   Typography,
+  CircularProgress,
   Link as MuiLink,
 } from "@mui/material";
 
 export default function SignupForm() {
-  const router = useRouter();
+  const { signup, loading, error,resetError } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const onSubmit = () => {};
+  useEffect(() => {
+    resetError();
+  }, []);
 
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+    console.log(email,"email")
+    await signup(email, password, confirmPassword);
+    if (error) {
+      toast.error(error);
+    } else {
+      toast.success("Signup successful!");
+    }
+  };
   return (
     <Container
       className="h-screen flex flex-col justify-center items-center gap-4"
       maxWidth="sm"
     >
-      <form action={onSubmit} className="">
+      <form onSubmit={onSubmit} className="">
         <Box
           sx={{
             width: "100%",
@@ -36,6 +54,11 @@ export default function SignupForm() {
           <Typography variant="h5" component="h1" gutterBottom>
             Sign up to create an account.
           </Typography>
+          {error && (
+            <Typography variant="body2" color="error">
+              {error}
+            </Typography>
+          )}
           <TextField
             fullWidth
             margin="normal"
@@ -46,6 +69,8 @@ export default function SignupForm() {
             placeholder="Enter your email address"
             required
             variant="outlined"
+            onChange={(e) => setEmail(e.target.value)}
+
           />
           <TextField
             fullWidth
@@ -58,6 +83,8 @@ export default function SignupForm() {
             required
             variant="outlined"
             inputProps={{ minLength: 6 }}
+            onChange={(e) => setPassword(e.target.value)}
+
           />
           <TextField
             fullWidth
@@ -70,8 +97,10 @@ export default function SignupForm() {
             required
             variant="outlined"
             inputProps={{ minLength: 6 }}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+
           />
-          <SignupButton />
+          <SignupButton loading={loading} />
         </Box>
 
         <MuiLink component={Link} href="/login" underline="none">
@@ -91,16 +120,17 @@ export default function SignupForm() {
   );
 }
 
-function SignupButton() {
+function SignupButton({ loading }) {
   return (
     <Button
       type="submit"
       fullWidth
       variant="contained"
       color="primary"
+      disabled={loading}
       sx={{ mt: 3, mb: 2 }}
     >
-      Sign up
+      {loading ? <CircularProgress size={24} /> : "Sign up"}
     </Button>
   );
 }
