@@ -42,10 +42,10 @@ function Chat({ id, className, session, missingKeys }) {
           title: "string",
           response_txt: "string",
           request_txt: input,
-          email: "syed.osama.ali.96@gmail.com",
+          email: state?.user?.email,
           base64Image: "string",
 
-          // str: input
+      
         }),
       });
 
