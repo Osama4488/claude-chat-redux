@@ -1,7 +1,8 @@
+// pages/chat.js
 import React, { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
-import { Container, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import ChatPanel from "../../components/chat-panel";
 import Header from "../../layout/header";
 import Sidebar from "../../components/chat-sidebar";
@@ -9,6 +10,7 @@ import parse from "html-react-parser";
 import PrivateRoute from "../../components/private-route";
 import { useAuth } from "../../context/AuthContext";
 import CodeBlock from "../../components/code-block";
+
 function Chat({ id, className, session, missingKeys }) {
   const router = useRouter();
   const path = usePathname();
@@ -19,13 +21,32 @@ function Chat({ id, className, session, missingKeys }) {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [shouldStop, setShouldStop] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const chatHistory = [{ summary: "write a blog on coding" }];
+  const chatHistory = state.user?.userHistory || [];
   const animationRef = useRef(null);
 
   useEffect(() => {
     console.log("ppp", state);
   }, [state, state.user]);
+
+  useEffect(() => {
+    if (selectedChat !== null) {
+      const selectedChatData = chatHistory[selectedChat];
+      if (selectedChatData) {
+        setResponseStream([selectedChatData.response_txt || ""]);
+      }
+    }
+  }, [selectedChat, chatHistory]);
+
+  useEffect(() => {
+    // Simulate chat loading
+    if (chatHistory.length === 0) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [chatHistory]);
 
   const fetchResponse = async () => {
     try {
@@ -44,8 +65,6 @@ function Chat({ id, className, session, missingKeys }) {
           request_txt: input,
           email: state?.user?.email,
           base64Image: "string",
-
-      
         }),
       });
 
@@ -131,13 +150,19 @@ function Chat({ id, className, session, missingKeys }) {
     <>
       <Header />
       <Box sx={{ display: "flex" }}>
-        <Sidebar chatHistory={state.user?.userHistory} onSelectChat={handleSelectChat} />{" "}
+        <Sidebar
+          chatHistory={chatHistory}
+          onSelectChat={handleSelectChat}
+          selectedChatIndex={selectedChat}
+          isLoading={isLoading}
+        />{" "}
         {/* Add Sidebar */}
-        {/* <Box sx={{ flexGrow: 1, p: 2 }}>
+       
+        <Box sx={{ flexGrow: 1, p: 2 }}>
           <div className="h-full flex flex-col justify-between mt-6">
             {responseStream.length > 0 ? (
               <div className="max-w-[900px] mx-auto text-left break-word">
-                {parse(responseStream.join(""))}
+                <CodeBlock code={responseStream.join("")} />
               </div>
             ) : (
               <EmptyScreen />
@@ -152,29 +177,7 @@ function Chat({ id, className, session, missingKeys }) {
               streaming={sendingMessage}
             />
           </div>
-        </Box> */}
-      <Box sx={{ flexGrow: 1, p: 2 }}>
-  <div className="h-full flex flex-col justify-between mt-6">
-    {responseStream.length > 0 ? (
-      <div className="max-w-[900px] mx-auto text-left break-word">
-        <CodeBlock code={responseStream.join("")} />
-      </div>
-    ) : (
-      <EmptyScreen />
-    )}
-    <ChatPanel
-      id={id}
-      input={input}
-      setInput={setInput}
-      handleSend={handleSend}
-      sendingMessage={sendingMessage}
-      handleStopStreaming={handleStop}
-      streaming={sendingMessage}
-    />
-  </div>
-</Box>
-
-
+        </Box>
       </Box>
     </>
   );
