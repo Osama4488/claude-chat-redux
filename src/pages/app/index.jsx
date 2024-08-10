@@ -1,72 +1,181 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 import { Container, Box } from "@mui/material";
 import ChatPanel from "../../components/chat-panel";
 import Header from "../../layout/header";
-
-export default function Chat({ id, className, session, missingKeys }) {
+import Sidebar from "../../components/chat-sidebar";
+import parse from "html-react-parser";
+import PrivateRoute from "../../components/private-route";
+import { useAuth } from "../../context/AuthContext";
+import CodeBlock from "../../components/code-block";
+function Chat({ id, className, session, missingKeys }) {
   const router = useRouter();
   const path = usePathname();
+  const { state } = useAuth();
+
   const [input, setInput] = useState("");
-  const [responseStream, setResponseStream] = useState([]); // State to store streamed responses
-  const [sendingMessage, setSendingMessage] = useState(false); // State for sending message loader
+  const [responseStream, setResponseStream] = useState([]);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [shouldStop, setShouldStop] = useState(false);
+
+  const chatHistory = [{ summary: "write a blog on coding" }];
+  const animationRef = useRef(null);
+
+  useEffect(() => {
+    console.log("ppp", state);
+  }, [state, state.user]);
 
   const fetchResponse = async () => {
     try {
       setSendingMessage(true); // Start loader
-      const apiUrl = `https://junaid121e2e-001-site1.ctempurl.com/api/ResponseGeneration/StreamTextResponseGenerator?str=${encodeURIComponent(
-        input
-      )}`;
-      const response = await axios.get(apiUrl);
-      console.log(response,"response")
-      setResponseStream(prevStream => [...prevStream, response.data.results]); // Append new response to stream
+      setShouldStop(false); // Reset stop flag
+      const apiUrl = `https://junaid121e2e-001-site1.ctempurl.com/api/ResponseGeneration/TextResponseGenerator`;
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: "string",
+          response_txt: "string",
+          request_txt: input,
+          email: "syed.osama.ali.96@gmail.com",
+          base64Image: "string",
+
+          // str: input
+        }),
+      });
+
+      console.log(response, "response");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .getReader();
+      let streamData = "";
+      let currentIndex = 0;
+      let lastTimestamp = 0;
+      const delay = 50; // Milliseconds between each word
+
+      const renderWords = (timestamp) => {
+        if (shouldStop) {
+          console.log("inside shouldStop");
+          setSendingMessage(false);
+          cancelAnimationFrame(animationRef.current);
+          return;
+        }
+
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const elapsed = timestamp - lastTimestamp;
+
+        if (elapsed > delay) {
+          if (currentIndex < words.length) {
+            setResponseStream((prevStream) => [
+              ...prevStream,
+              words[currentIndex] + " ",
+            ]);
+            currentIndex++;
+            lastTimestamp = timestamp;
+          } else {
+            setSendingMessage(false);
+            cancelAnimationFrame(animationRef.current);
+            return;
+          }
+        }
+        animationRef.current = requestAnimationFrame(renderWords);
+      };
+
+      // Reading the response body and then processing it
+      const words = [];
+      while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) break;
+        streamData += value;
+      }
+
+      console.log(streamData, "streamData");
+
+      words.push(...streamData.split(" "));
+
+      animationRef.current = requestAnimationFrame(renderWords);
     } catch (error) {
       console.error("Error fetching response:", error);
-      // Handle error state if needed
-    } finally {
-      setSendingMessage(false); // Stop loader
+      setSendingMessage(false);
+      cancelAnimationFrame(animationRef.current);
     }
   };
 
+  const handleStop = () => {
+    console.log("handle stop clicked");
+    setShouldStop(true); 
+  };
+
   const handleSend = () => {
-    // Call API to fetch response when sending a message
+    setResponseStream([]);
     fetchResponse();
-    setInput(""); // Clear input after sending
+    setInput("");
+  };
+
+  const handleSelectChat = (index) => {
+    setSelectedChat(index);
   };
 
   return (
     <>
       <Header />
-      <Container className="group w-full overflow-auto ">
-        <Box
-          sx={{
-            pb: "200px",
-            pt: { xs: 4, md: 10 },
-            ...(className ? { className } : {}),
-          }}
-          className="flex flex-col justify-between"
-        >
-          {responseStream.length > 0 ? (
-            responseStream.map((response, index) => (
-              <div key={index}>{response}</div>
-            ))
-          ) : (
-            <EmptyScreen />
-          )}
-          <Box sx={{ width: "100%", height: "1px" }} />
+      <Box sx={{ display: "flex" }}>
+        <Sidebar chatHistory={state.user?.userHistory} onSelectChat={handleSelectChat} />{" "}
+        {/* Add Sidebar */}
+        {/* <Box sx={{ flexGrow: 1, p: 2 }}>
+          <div className="h-full flex flex-col justify-between mt-6">
+            {responseStream.length > 0 ? (
+              <div className="max-w-[900px] mx-auto text-left break-word">
+                {parse(responseStream.join(""))}
+              </div>
+            ) : (
+              <EmptyScreen />
+            )}
+            <ChatPanel
+              id={id}
+              input={input}
+              setInput={setInput}
+              handleSend={handleSend}
+              sendingMessage={sendingMessage}
+              handleStopStreaming={handleStop}
+              streaming={sendingMessage}
+            />
+          </div>
+        </Box> */}
+      <Box sx={{ flexGrow: 1, p: 2 }}>
+  <div className="h-full flex flex-col justify-between mt-6">
+    {responseStream.length > 0 ? (
+      <div className="max-w-[900px] mx-auto text-left break-word">
+        <CodeBlock code={responseStream.join("")} />
+      </div>
+    ) : (
+      <EmptyScreen />
+    )}
+    <ChatPanel
+      id={id}
+      input={input}
+      setInput={setInput}
+      handleSend={handleSend}
+      sendingMessage={sendingMessage}
+      handleStopStreaming={handleStop}
+      streaming={sendingMessage}
+    />
+  </div>
+</Box>
 
-          <ChatPanel
-            id={id}
-            input={input}
-            setInput={setInput}
-            handleSend={handleSend}
-            sendingMessage={sendingMessage} // Pass sendingMessage state to ChatPanel
-          />
 
-        </Box>
-      </Container>
+      </Box>
     </>
   );
 }
@@ -97,3 +206,5 @@ function EmptyScreen() {
     </div>
   );
 }
+
+export default Chat;

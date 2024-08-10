@@ -1,16 +1,18 @@
 import React from "react";
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext"; // Adjust the import path as necessary
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   return (
-    <header className="bg-gray-800 text-white shadow-md ">
+    <header className="bg-gray-800 text-white shadow-md">
       <div className="container mx-auto flex justify-between items-center p-4">
         <div className="text-xl font-bold">
           <Link className="hover:text-gray-400" href="/">
@@ -34,6 +36,9 @@ function Header() {
           <Link className="hover:text-gray-400" href="/contact">
             Contact
           </Link>
+          <button onClick={logout} className="hover:text-gray-400">
+            Logout
+          </button>
         </nav>
         <div className="md:hidden">
           <button onClick={toggleMenu} className="focus:outline-none">
@@ -71,6 +76,9 @@ function Header() {
           <Link className="hover:text-gray-400" href="/contact">
             Contact
           </Link>
+          <button onClick={logout} className="hover:text-gray-400">
+            Logout
+          </button>
         </nav>
       )}
     </header>

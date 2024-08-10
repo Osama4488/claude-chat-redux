@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
-import { toast } from "sonner";
+import { useRouter } from "next/router";
 import {
   Box,
   Button,
@@ -13,29 +13,49 @@ import {
   CircularProgress,
   Link as MuiLink,
 } from "@mui/material";
+import { useToast } from "../context/ToastContext";
 
 export default function LoginForm() {
-  const { login, loading, error,resetError } = useAuth();
+  const { login, loading, error, resetError, state } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { showToast } = useToast();
+  const router = useRouter();
 
+  // Redirect to /app if the user is already authenticated
+  // useEffect(() => {
+  //   if (state.authenticated) {
+  //     window.location.href = "/app";
+  //   }
+  // }, [state.authenticated, router]);
+
+  // Reset error on component mount
   useEffect(() => {
     resetError();
-  }, []);
+  }, [resetError]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    await login(email, password);
-    if (error) {
-      toast.error(error);
-    } else {
-      toast.success("Login successful!");
+    try {
+      await login(email, password);
+      console.log(state,"state after login failed")
+      if (error) {
+        showToast(error, "error");
+      } else {
+        // showToast("Login successful!", "success");
+        // window.location.href = "/app";
+      }
+    } catch (err) {
+      showToast("An error occurred during login.", "error");
     }
   };
 
   return (
-    <Container className="h-screen flex flex-col justify-center items-center gap-4" maxWidth="sm">
-      <form onSubmit={onSubmit} className="">
+    <Container
+      className="h-screen flex flex-col justify-center items-center gap-4"
+      maxWidth="sm"
+    >
+      <form onSubmit={onSubmit}>
         <Box
           sx={{
             width: "100%",
@@ -80,13 +100,17 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <LoginButton loading={loading} />
+          <LoginButton loading={state.loading} />
         </Box>
 
         <MuiLink component={Link} href="/signup" underline="none">
           <Typography variant="body2" color="textSecondary">
             No account yet?{" "}
-            <Typography component="span" fontWeight="fontWeightBold" sx={{ textDecoration: "underline" }}>
+            <Typography
+              component="span"
+              fontWeight="fontWeightBold"
+              sx={{ textDecoration: "underline" }}
+            >
               Sign up
             </Typography>
           </Typography>
@@ -98,7 +122,14 @@ export default function LoginForm() {
 
 function LoginButton({ loading }) {
   return (
-    <Button type="submit" fullWidth variant="contained" color="primary" disabled={loading} sx={{ mt: 3, mb: 2 }}>
+    <Button
+      type="submit"
+      fullWidth
+      variant="contained"
+      color="primary"
+      disabled={loading}
+      sx={{ mt: 3, mb: 2 }}
+    >
       {loading ? <CircularProgress size={24} /> : "Log in"}
     </Button>
   );
