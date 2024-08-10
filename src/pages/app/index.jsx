@@ -147,19 +147,51 @@ function Chat({ id, className, session, missingKeys }) {
   };
 
   return (
+    // <>
+    //   <Header />
+    //   <Box sx={{ display: "flex" }}>
+    //     <Sidebar
+    //       chatHistory={chatHistory}
+    //       onSelectChat={handleSelectChat}
+    //       selectedChatIndex={selectedChat}
+    //       isLoading={isLoading}
+    //     />{" "}
+   
+       
+    //     <Box sx={{ flexGrow: 1, p: 2, }}>
+    //       <div className="h-full flex flex-col justify-between mt-6">
+    //         {responseStream.length > 0 ? (
+    //           <div className="max-w-[900px] mx-auto text-left break-word">
+    //             <CodeBlock code={responseStream.join("")} />
+    //           </div>
+    //         ) : (
+    //           <EmptyScreen />
+    //         )}
+    //         <ChatPanel
+    //           id={id}
+    //           input={input}
+    //           setInput={setInput}
+    //           handleSend={handleSend}
+    //           sendingMessage={sendingMessage}
+    //           handleStopStreaming={handleStop}
+    //           streaming={sendingMessage}
+    //         />
+    //       </div>
+    //     </Box>
+    //   </Box>
+    // </>
     <>
-      <Header />
-      <Box sx={{ display: "flex" }}>
-        <Sidebar
+    <Header />
+    <Box sx={{ display: 'flex',flexDirection: 'column' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>
+      <Sidebar
           chatHistory={chatHistory}
           onSelectChat={handleSelectChat}
           selectedChatIndex={selectedChat}
           isLoading={isLoading}
         />{" "}
-        {/* Add Sidebar */}
-       
-        <Box sx={{ flexGrow: 1, p: 2 }}>
-          <div className="h-full flex flex-col justify-between mt-6">
+        <Box sx={{ flexGrow: 1, p: 2, overflowY: 'auto', display: 'flex', flexDirection: 'column', height: '78vh', overflow: 'hidden',  }}>
+          <Box sx={{ flexGrow: 1 }}>
             {responseStream.length > 0 ? (
               <div className="max-w-[900px] mx-auto text-left break-word">
                 <CodeBlock code={responseStream.join("")} />
@@ -167,19 +199,21 @@ function Chat({ id, className, session, missingKeys }) {
             ) : (
               <EmptyScreen />
             )}
-            <ChatPanel
-              id={id}
-              input={input}
-              setInput={setInput}
-              handleSend={handleSend}
-              sendingMessage={sendingMessage}
-              handleStopStreaming={handleStop}
-              streaming={sendingMessage}
-            />
-          </div>
+          </Box>
+          <ChatPanel
+            id={id}
+            input={input}
+            setInput={setInput}
+            handleSend={handleSend}
+            sendingMessage={sendingMessage}
+            handleStopStreaming={handleStop}
+            streaming={sendingMessage}
+          />
         </Box>
       </Box>
-    </>
+    </Box>
+  </>
+  
   );
 }
 
