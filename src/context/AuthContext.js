@@ -204,16 +204,40 @@ const fetchHistory = async () => {
   };
 
   // Logout function
-  const logout = () => {
-    setState({
-      user: null,
-      authenticated: false,
-      loading: false,
-      error: null,
-    });
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
-    router.push("/login");
+  // const logout = () => {
+  //   setState({
+  //     user: null,
+  //     authenticated: false,
+  //     loading: false,
+  //     error: null,
+  //   });
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("email");
+  //   window.location.href = "/login"; // Redirect to /app
+
+  //   // router.push("/login");
+  // };
+  const logout = async () => {
+    // Optionally handle cleanup or any additional async operations before logging out
+    try {
+      // Ensure that state updates are applied before redirecting
+      setState((prevState) => ({
+        ...prevState,
+        user: null,
+        authenticated: false,
+        loading: false,
+        error: null,
+      }));
+    
+      // Remove token and other local storage items
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
+      
+      // Redirect after cleanup
+      await router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const resetError = () => {
