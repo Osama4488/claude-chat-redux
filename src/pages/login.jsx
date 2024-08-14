@@ -23,11 +23,11 @@ export default function LoginForm() {
   const router = useRouter();
 
   // Redirect to /app if the user is already authenticated
-  // useEffect(() => {
-  //   if (state.authenticated) {
-  //     window.location.href = "/app";
-  //   }
-  // }, [state.authenticated, router]);
+  useEffect(() => {
+    if (state.authenticated) {
+      window.location.href = "/app";
+    }
+  }, [state.authenticated, router]);
 
   // Reset error on component mount
   useEffect(() => {
