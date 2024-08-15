@@ -58,7 +58,7 @@ import { useAuth } from '../context/AuthContext';
 const Sidebar = ({ chatHistory, onSelectChat, selectedChatIndex, isLoading }) => {
   const { state } = useAuth();
   const userTimeZone = state.user?.timeZone || 'UTC'; // Fallback to UTC if time zone is not available
-
+  
   return (
     <Box
       sx={{
@@ -99,7 +99,7 @@ const Sidebar = ({ chatHistory, onSelectChat, selectedChatIndex, isLoading }) =>
                 }}
               >
                 <ListItemText
-                  primary={chat.request_txt}
+                  primary={chat.title}
                   primaryTypographyProps={{ fontWeight: selectedChatIndex === index ? 'bold' : 'normal' }}
                   secondary={
                     <div style={{ color:selectedChatIndex === index ? "#fff" : '#888', fontSize: '0.875rem' }}>
