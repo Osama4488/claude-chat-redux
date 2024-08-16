@@ -9,6 +9,8 @@ import { useAuth } from "../../context/AuthContext";
 import CodeBlock from "../../components/code-block";
 import EmptyScreen from "../../components/empty-screen"
 import Header from "../../layout/header"
+import { toast } from "react-toastify";
+
 function Chat({ id, className, session, missingKeys }) {
   const { state, fetchHistory } = useAuth();
 
@@ -35,7 +37,7 @@ function Chat({ id, className, session, missingKeys }) {
     setIsLoading(chatHistory.length === 0);
   }, [chatHistory]);
 
-  const fetchResponse = async () => {
+  const fetchResponse = async (sanitizedInput) => {
     try {
       setSendingMessage(true);
       setShouldStop(false);
@@ -50,7 +52,7 @@ function Chat({ id, className, session, missingKeys }) {
         body: JSON.stringify({
           title: "string",
           response_txt: "string",
-          request_txt: input,
+          request_txt: sanitizedInput,
           email: state?.user?.email,
           base64Image: "string",
         }),
@@ -95,7 +97,7 @@ function Chat({ id, className, session, missingKeys }) {
         if (done) break;
         streamData += value;
         words.push(...value.split(" "));
-        console.log(words,"words")
+        
       }
 
       animationRef.current = requestAnimationFrame(renderWords);
@@ -117,9 +119,18 @@ function Chat({ id, className, session, missingKeys }) {
   };
 
   const handleSend = async () => {
-    setResponseStream([]);
-    await fetchResponse();
+   
+    const sanitizedInput = input.trim();
+    if(input !== ""){
+      setResponseStream([]);
+    await fetchResponse(sanitizedInput);
     setInput("");
+    }
+    else {
+      toast.error("Please enter a valid input.", { toastId: "error-toast-app" });
+
+    }
+    
   };
 
   const handleSelectChat = (index) => {

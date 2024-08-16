@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { Snackbar, Alert } from "@mui/material";
+
 
 const AuthContext = createContext();
 
@@ -17,14 +17,10 @@ export const AuthProvider = ({ children }) => {
     loading: true,
     error: null,
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // State to control Snackbar
-  const [snackbarMessage, setSnackbarMessage] = useState(""); // State to hold the Snackbar message
+  
   const router = useRouter();
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-    setSnackbarMessage("");
-  };
+  
 
   // Load user and user history from localStorage on mount
   useEffect(() => {
@@ -59,8 +55,8 @@ export const AuthProvider = ({ children }) => {
             loading: false,
             error: "Failed to fetch user data.",
           });
-          setSnackbarMessage("Failed to fetch user data.");
-          setSnackbarOpen(true); // Show Snackbar on error
+         
+         
 
           if (router.pathname !== "/login" && router.pathname !== "/signup") {
             router.push("/login");
@@ -73,8 +69,7 @@ export const AuthProvider = ({ children }) => {
           loading: false,
           error: "An error occurred during login.",
         });
-        setSnackbarMessage("An error occurred during login.");
-        // setSnackbarOpen(true); // Show Snackbar on error
+      
 
         if (router.pathname !== "/login" && router.pathname !== "/signup") {
           router.push("/login");
@@ -146,7 +141,7 @@ const fetchHistory = async () => {
         error: null,
       });
 
-      window.location.href = "/app"; // Redirect to /app
+      // window.location.href = "/app"; // Redirect to /app
     } catch (error) {
       console.error("Authentication error", error);
       setState({
@@ -247,18 +242,7 @@ const fetchHistory = async () => {
   return (
     <AuthContext.Provider value={{ state, login, signup, logout, resetError,fetchHistory }}>
       {children}
-      {snackbarOpen && (
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: "100%" }}>
-            {snackbarMessage} {/* Display the Snackbar message */}
-          </Alert>
-        </Snackbar>
-      )}
+     
     </AuthContext.Provider>
   );
 };

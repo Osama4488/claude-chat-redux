@@ -28,7 +28,7 @@ export default function SignupForm() {
   const onSubmit = async (event) => {
     event.preventDefault();
 
-    console.log(email,"email")
+   
     await signup(email, password, confirmPassword);
     if (error) {
       toast.error(error);
