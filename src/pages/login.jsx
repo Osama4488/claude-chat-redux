@@ -156,6 +156,7 @@ export default function LoginForm() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log(state,"state in login")
     if (state.authenticated) {
       window.location.href = "/app";
     }
@@ -176,7 +177,8 @@ export default function LoginForm() {
           toastId: "success-toast",
           autoClose: 5000,
         });
-        router.push("/app");
+        window.location.href = "/app";
+
       }
     } catch (err) {
       toast.error("An error occurred during login.", { toastId: "error-toast" });

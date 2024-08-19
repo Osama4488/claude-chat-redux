@@ -385,29 +385,7 @@ export default function ChatPanel({
             />
 
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-              {/* <IconButton
-                color="primary"
-                component="label"
-                htmlFor="upload-image-input"
-                sx={{ mr: 1 }}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 3L4 9H7V19H17V9H20L12 3Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M13 16V13H11V16H8L12 20L16 16H13Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </IconButton> */}
+             
       <IconButton
   color="primary"
   component="label"

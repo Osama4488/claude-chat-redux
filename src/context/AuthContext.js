@@ -14,11 +14,14 @@ export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
     user: null,
     authenticated: false,
-    loading: true,
+    loading: false,
     error: null,
   });
   
   const router = useRouter();
+
+
+ 
 
   
 
@@ -28,23 +31,14 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       const email = localStorage.getItem("email");
 
+        // Allow access to public routes
+        if (router.pathname === "/") {
+          return;
+        }
+
       if (token && email) {
         try {
-          // const response = await axios.get(process.env.NEXT_PUBLIC_HISTORY_URL, {
-          //   params: { email },
-          // });
-
-          // const userHistory = response.data;
-
-          // setState({
-          //   user: {
-          //     email,
-          //     userHistory,
-          //   },
-          //   authenticated: true,
-          //   loading: false,
-          //   error: null,
-          // });
+          
            await fetchHistory(email);
 
         } catch (error) {
@@ -82,7 +76,7 @@ export const AuthProvider = ({ children }) => {
 
 
   // New fetchHistory function
-const fetchHistory = async () => {
+ const fetchHistory = async () => {
   try {
     const email = localStorage.getItem("email");
     const response = await axios.get(process.env.NEXT_PUBLIC_HISTORY_URL, {
@@ -123,13 +117,15 @@ const fetchHistory = async () => {
       localStorage.setItem("token", accessToken);
       localStorage.setItem("email", email);
 
-      // Fetch user history after login
-      const userHistoryResponse = await axios.get(process.env.NEXT_PUBLIC_HISTORY_URL, {
-        params: { email },
-      });
+      // // Fetch user history after login
+      // const userHistoryResponse = await axios.get(process.env.NEXT_PUBLIC_HISTORY_URL, {
+      //   params: { email },
+      // });
 
-      const userHistory = userHistoryResponse.data;
+      // const userHistory = userHistoryResponse.data;
 
+
+       const userHistory =  await fetchHistory(email);
       // Update state with user data and history
       setState({
         user: {
@@ -165,8 +161,7 @@ const fetchHistory = async () => {
         loading: false,
         error: "Passwords do not match.",
       }));
-      setSnackbarMessage("Passwords do not match.");
-      setSnackbarOpen(true); // Show Snackbar on error
+  
       return;
     }
 
@@ -198,20 +193,7 @@ const fetchHistory = async () => {
     }
   };
 
-  // Logout function
-  // const logout = () => {
-  //   setState({
-  //     user: null,
-  //     authenticated: false,
-  //     loading: false,
-  //     error: null,
-  //   });
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("email");
-  //   window.location.href = "/login"; // Redirect to /app
-
-  //   // router.push("/login");
-  // };
+ 
   const logout = async () => {
     // Optionally handle cleanup or any additional async operations before logging out
     try {

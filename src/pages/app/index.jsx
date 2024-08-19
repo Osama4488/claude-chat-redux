@@ -10,7 +10,7 @@ import CodeBlock from "../../components/code-block";
 import EmptyScreen from "../../components/empty-screen"
 import Header from "../../layout/header"
 import { toast } from "react-toastify";
-
+import PrivateRoute from '../../layout/PrivateRoute';
 function Chat({ id, className, session, missingKeys }) {
   const { state, fetchHistory } = useAuth();
 
@@ -23,6 +23,9 @@ function Chat({ id, className, session, missingKeys }) {
 
   const chatHistory = state.user?.userHistory || [];
   const animationRef = useRef(null);
+
+
+
 
   useEffect(() => {
     if (selectedChat !== null) {
@@ -196,4 +199,6 @@ function Chat({ id, className, session, missingKeys }) {
 
 
 
+// export default PrivateRoute(Chat);
 export default Chat;
+
