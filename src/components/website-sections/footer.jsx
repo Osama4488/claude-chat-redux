@@ -52,7 +52,7 @@ const Footer = () => {
           {/* Logo and Additional Information */}
           <div className="flex flex-col items-center md:items-end">
             <img src="https://via.placeholder.com/150" alt="Dummy Logo" className="mb-4" />
-            <p className="mb-4 text-center md:text-right">Your Company's mission statement or any other information you want to include here.</p>
+            <p className="mb-4 text-center md:text-right">Your Company&apos;s mission statement or any other information you want to include here.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-white hover:text-orange-500"><i className="fab fa-facebook-f"></i></a>
               <a href="#" className="text-white hover:text-orange-500"><i className="fab fa-twitter"></i></a>
@@ -63,7 +63,7 @@ const Footer = () => {
         </div>
 
         <div className="text-center text-sm text-gray-400">
-          <p>© 2024 Your Company. All rights reserved.</p>
+          <p>&copy; 2024 Your Company. All rights reserved.</p>
         </div>
       </div>
     </footer>

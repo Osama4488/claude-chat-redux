@@ -1,9 +1,7 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const YourComponent = () => {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
       <div className="text-center">
@@ -14,7 +12,10 @@ const YourComponent = () => {
           We are currently performing scheduled maintenance. We will be back shortly.
         </p>
         <p className="text-lg md:text-xl lg:text-2xl mb-8">
-          In the meantime, you can check out our <a href="/login" className="text-blue-500 hover:underline">app</a>.
+          In the meantime, you can check out our{' '}
+          <Link href="/login">
+            <a className="text-blue-500 hover:underline">app</a>
+          </Link>.
         </p>
         <p className="text-sm md:text-base lg:text-lg text-gray-600">
           Thank you for your patience.
