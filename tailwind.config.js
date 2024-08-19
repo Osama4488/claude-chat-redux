@@ -1,5 +1,4 @@
-
-
+// tailwind.config.js
 const config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,8 +13,19 @@ const config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      container: {
+        center: true, // Center the container
+        padding: {
+          DEFAULT: '1rem', // Default padding
+          sm: '2rem', // Padding for small screens and up
+          md: '4rem', // Padding for medium screens and up
+          lg: '6rem', // Padding for large screens and up
+          xl: '8rem', // Padding for extra-large screens and up
+        },
+      },
     },
   },
   plugins: [],
 };
+
 export default config;

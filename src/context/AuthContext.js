@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       const email = localStorage.getItem("email");
 
         // Allow access to public routes
-        if (router.pathname === "/") {
+        if (router.pathname === "/" || router.pathname === "/new") {
           return;
         }
 

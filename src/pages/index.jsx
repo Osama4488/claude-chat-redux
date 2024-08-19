@@ -1,37 +1,25 @@
 import React from 'react';
-import HeroSection from '../components/website-sections/hero'; // Adjust the path as needed
+import { useRouter } from 'next/router';
 
 const YourComponent = () => {
+  const router = useRouter();
+
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-
-
-<HeroSection />
-      {/* Hero Section */}
-    
-
-      {/* Features Section */}
-      <section className="mt-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-semibold mb-4">Feature One</h2>
-            <p className="text-gray-600">Description of feature one goes here.</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-semibold mb-4">Feature Two</h2>
-            <p className="text-gray-600">Description of feature two goes here.</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <h2 className="text-xl font-semibold mb-4">Feature Three</h2>
-            <p className="text-gray-600">Description of feature three goes here.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="mt-12 bg-gray-800 text-white py-4 w-full text-center">
-        <p className="text-sm">© 2024 Your Company. All rights reserved.</p>
-      </footer>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
+      <div className="text-center">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+          Website Under Maintenance
+        </h1>
+        <p className="text-lg md:text-xl lg:text-2xl mb-8">
+          We are currently performing scheduled maintenance. We will be back shortly.
+        </p>
+        <p className="text-lg md:text-xl lg:text-2xl mb-8">
+          In the meantime, you can check out our <a href="/login" className="text-blue-500 hover:underline">app</a>.
+        </p>
+        <p className="text-sm md:text-base lg:text-lg text-gray-600">
+          Thank you for your patience.
+        </p>
+      </div>
     </div>
   );
 };
