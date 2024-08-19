@@ -175,7 +175,7 @@ export default function LoginForm() {
       } else {
         toast.success("Login successful!", {
           toastId: "success-toast",
-          autoClose: 5000,
+         
         });
         window.location.href = "/app";
 

@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-
+import posthog from "../lib/posthog";
 
 const AuthContext = createContext();
 
@@ -137,6 +137,11 @@ export const AuthProvider = ({ children }) => {
         error: null,
       });
 
+      // Track the login event
+      posthog.capture('user_logged_in', {
+        distinct_id: email,
+      });
+
       // window.location.href = "/app"; // Redirect to /app
     } catch (error) {
       console.error("Authentication error", error);
@@ -182,14 +187,18 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem("user", JSON.stringify(userData));
       window.location.replace("/app");
+
+      // Track the signup event
+      posthog.capture('user_signed_up', {
+        distinct_id: email,
+      });
     } catch (error) {
       setState((prevState) => ({
         ...prevState,
         loading: false,
         error: "An error occurred during signup.",
       }));
-      setSnackbarMessage("An error occurred during signup.");
-      setSnackbarOpen(true); // Show Snackbar on error
+     
     }
   };
 
@@ -209,6 +218,11 @@ export const AuthProvider = ({ children }) => {
       // Remove token and other local storage items
       localStorage.removeItem("token");
       localStorage.removeItem("email");
+
+      // Track the logout event
+      posthog.capture('user_logged_out', {
+        distinct_id: state.user?.email,
+      });
       
       // Redirect after cleanup
       await router.push("/login");

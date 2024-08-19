@@ -10,6 +10,8 @@ import CodeBlock from "../../components/code-block";
 import EmptyScreen from "../../components/empty-screen"
 import Header from "../../layout/header"
 import { toast } from "react-toastify";
+import posthog from "../../lib/posthog";
+
 import PrivateRoute from '../../layout/PrivateRoute';
 function Chat({ id, className, session, missingKeys }) {
   const { state, fetchHistory } = useAuth();
@@ -23,6 +25,12 @@ function Chat({ id, className, session, missingKeys }) {
 
   const chatHistory = state.user?.userHistory || [];
   const animationRef = useRef(null);
+
+
+  useEffect(() => {
+    posthog.capture('$pageview');
+  }, []);
+  
 
 
 
@@ -44,6 +52,12 @@ function Chat({ id, className, session, missingKeys }) {
     try {
       setSendingMessage(true);
       setShouldStop(false);
+
+        // Track message sending
+        posthog.capture('message_sent', {
+          user: state?.user?.email,
+          message: sanitizedInput,
+        });
 
       const apiUrl = `https://junaid121e2e-001-site1.ctempurl.com/api/ResponseGeneration/TextResponseGenerator`;
 
@@ -107,6 +121,12 @@ function Chat({ id, className, session, missingKeys }) {
 
       await fetchHistory();
 
+       // Track chat history loading
+       posthog.capture('chat_history_loaded', {
+        user: state?.user?.email,
+        historyLength: chatHistory.length,
+      });
+
       const newChatIndex = chatHistory.length;
       setSelectedChat(newChatIndex);
       handleSelectChat(newChatIndex);
@@ -138,6 +158,12 @@ function Chat({ id, className, session, missingKeys }) {
 
   const handleSelectChat = (index) => {
     setSelectedChat(index);
+
+    // Track chat selection
+    posthog.capture('chat_selected', {
+      user: state?.user?.email,
+      chatIndex: index,
+    });
   };
 
   return (
