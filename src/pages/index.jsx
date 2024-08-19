@@ -13,7 +13,7 @@ const YourComponent = () => {
         </p>
         <p className="text-lg md:text-xl lg:text-2xl mb-8">
           In the meantime, you can check out our{' '}
-          <Link href="/login">
+          <Link legacyBehavior href="/login">
             <a className="text-blue-500 hover:underline">app</a>
           </Link>.
         </p>

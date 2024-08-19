@@ -7,35 +7,35 @@ const Header = () => {
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <div className="text-black text-2xl font-bold">
-          <Link href="/">
+          <Link legacyBehavior href="/">
             <a>Your Logo</a>
           </Link>
         </div>
 
         {/* Navigation Links */}
         <nav className="flex space-x-6">
-          <Link href="/">
+          <Link legacyBehavior href="/">
             <a className="text-black text-lg hover:text-orange-500">Home</a>
           </Link>
-          <Link href="/about">
+          <Link legacyBehavior href="/about">
             <a className="text-black text-lg hover:text-orange-500">About</a>
           </Link>
-          <Link href="/services">
+          <Link legacyBehavior href="/services">
             <a className="text-black text-lg hover:text-orange-500">Services</a>
           </Link>
-          <Link href="/contact">
+          <Link legacyBehavior href="/contact">
             <a className="text-black text-lg hover:text-orange-500">Contact</a>
           </Link>
         </nav>
 
         {/* Sign Up and Login */}
         <div className="flex space-x-4">
-          <Link href="/signup">
+          <Link legacyBehavior href="/signup">
             <a className="bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition duration-300">
               Sign Up
             </a>
           </Link>
-          <Link href="/login">
+          <Link legacyBehavior href="/login">
             <a className="text-black text-lg hover:text-orange-500">Login</a>
           </Link>
         </div>
