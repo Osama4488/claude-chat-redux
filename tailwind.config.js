@@ -16,11 +16,11 @@ const config = {
       container: {
         center: true, // Center the container
         padding: {
-          DEFAULT: '1rem', // Default padding
-          sm: '2rem', // Padding for small screens and up
-          md: '4rem', // Padding for medium screens and up
-          lg: '6rem', // Padding for large screens and up
-          xl: '8rem', // Padding for extra-large screens and up
+          DEFAULT: "1rem", // Default padding
+          sm: "2rem", // Padding for small screens and up
+          md: "4rem", // Padding for medium screens and up
+          lg: "6rem", // Padding for large screens and up
+          xl: "8rem", // Padding for extra-large screens and up
         },
       },
     },

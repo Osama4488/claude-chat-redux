@@ -47,13 +47,18 @@ const testimonials = [
 
 const TestimonialSection = () => {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h2 className="text-3xl font-bold mb-8 text-center">What Our Users Say</h2>
+    <div className="container md:px-[100px] px-4 py-16">
+      <h2 className="text-3xl font-bold mb-6 text-center">
+          <span className="text-purple-600"> Testimonial</span><br />
+             
+Customers First Choice
+        </h2>
+ 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {testimonials.map(({ id, name, rating, testimonial, imageUrl }) => (
           <div
             key={id}
-            className="border-2 border-orange-500 p-6 rounded-lg shadow-lg bg-white flex items-start"
+            className="border-2 border-[#FF2210] p-6 rounded-lg shadow-lg bg-white flex items-start"
           >
             <div className="w-12 h-12 flex-shrink-0 mr-4">
               <img
@@ -64,7 +69,7 @@ const TestimonialSection = () => {
             </div>
             <div>
               <div className="text-xl font-semibold mb-2">{name}</div>
-              <div className="text-yellow-500 mb-2">{rating}</div>
+              <div className="text-[#FF2210] mb-2">{rating}</div>
               <p className="text-gray-600">{testimonial}</p>
             </div>
           </div>

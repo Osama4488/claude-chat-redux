@@ -1,44 +1,92 @@
-// src/components/website-sections/FeaturesSection.js
 import React from 'react';
+import CustomButton from '../Button';
+
+// Function to generate highlighted HTML
+const highlightText = (text, highlights) => {
+  // Escape special characters for regex
+  const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
+  // Create a regex pattern from the highlights array
+  const pattern = highlights.map(escapeRegExp).join('|');
+  const regex = new RegExp(`(${pattern})`, 'gi');
+
+  // Replace highlighted text with HTML
+  return text.replace(regex, '<span class="text-blue-500">$1</span>');
+};
 
 const features = [
   {
-    title: "Feature One",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.",
+    titleHighlighted: "Highly personalized AI",
+    title: "that fits how you work",
+    description: [
+      "Context-aware suggestions based on your code and patterns",
+      "Supports the most popular languages, libraries, and IDEs you use",
+      "Ability to create bespoke models trained on your codebase"
+    ],
     ctaText: "Learn More",
-    imageUrl: "https://via.placeholder.com/600"
+    imageUrl: "/img/feature-1.png"
   },
   {
-    title: "Feature Two",
-    description: "Curabitur euismod lectus nec sapien fermentum, eu feugiat turpis malesuada.",
-    ctaText: "Discover More",
-    imageUrl: "https://via.placeholder.com/600"
+    titleHighlighted: "Highly personalized AI",
+    title: "that fits how you work",
+    description: [
+      "Context-aware suggestions based on your code and patterns",
+      "Supports the most popular languages, libraries, and IDEs you use",
+      "Ability to create bespoke models trained on your codebase"
+    ],
+    ctaText: "Learn More",
+    imageUrl: "/img/feature-2.png"
   },
   {
-    title: "Feature Three",
-    description: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
-    ctaText: "Explore More",
-    imageUrl: "https://via.placeholder.com/600"
-  }
+    titleHighlighted: "Highly personalized AI",
+    title: "that fits how you work",
+    description: [
+      "Context-aware suggestions based on your code and patterns",
+      "Supports the most popular languages, libraries, and IDEs you use",
+      "Ability to create bespoke models trained on your codebase"
+    ],
+    ctaText: "Learn More",
+    imageUrl: "/img/feature-3.png"
+  },
 ];
 
 const FeaturesSection = () => {
+  // Text fragments to be highlighted
+  const highlightFragments = [
+    "Context-aware suggestions",
+    "most popular languages, libraries,",
+    "bespoke models",
+    // Add more text fragments if needed
+  ];
+
   return (
-    <section className="py-12 px-4 mt-[100px] container">
+    <section className=" mt-12 ">
       <div className="container">
         <div className="flex flex-col lg:space-x-8">
           {features.map((feature, index) => (
-            <div key={index} className="flex flex-col lg:flex-row items-center lg:justify-between mb-12 lg:mb-0">
+            <div key={index} className="flex flex-col lg:flex-row items-center lg:justify-between mb-8 lg:mb-16">
               {/* Left Section */}
               <div className="lg:w-1/2 mb-8 lg:mb-0 text-center lg:text-left">
-                <h2 className="text-3xl font-bold mb-4">{feature.title}</h2>
-                <p className="text-lg mb-8">{feature.description}</p>
-                <a
-                  href="#"
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition duration-300"
-                >
+                <h2 className="text-2xl lg:text-3xl font-bold mb-4 max-w-[350px]">
+                  <span className="text-purple-600">{feature.titleHighlighted}</span>{' '}
+                  {feature.title}
+                </h2>
+                <ul className="list-none text-base lg:text-lg mb-8">
+                  {feature.description.map((item, i) => (
+                    <li key={i} className="mb-2 flex items-start">
+                      <span className="text-gray-400 mr-2">-</span>
+                      <span
+                        className="ml-2"
+                        dangerouslySetInnerHTML={{ __html: highlightText(item, highlightFragments) }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <CustomButton href="/signup">
                   {feature.ctaText}
-                </a>
+                </CustomButton>
               </div>
 
               {/* Right Section */}
@@ -46,7 +94,7 @@ const FeaturesSection = () => {
                 <img
                   src={feature.imageUrl}
                   alt={feature.title}
-                  className="max-w-full h-auto"
+                  className="md:w-[350px] md:h-[247px] w-full h-auto object-contain"
                 />
               </div>
             </div>
