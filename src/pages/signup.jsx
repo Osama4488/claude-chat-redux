@@ -1,10 +1,7 @@
-"use client";
-
-import React, { useState,useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-
-import Link from "next/link";
-import { toast } from "sonner";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { signup, resetError } from '../store/authSlice';
+import Link from 'next/link';
 import {
   Box,
   Button,
@@ -13,46 +10,80 @@ import {
   Typography,
   CircularProgress,
   Link as MuiLink,
-} from "@mui/material";
+} from '@mui/material';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 
 export default function SignupForm() {
-  const { signup, loading, error,resetError } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const dispatch = useDispatch();
+  const { authenticated, loading, error } = useSelector((state) => state.auth);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    resetError();
-  }, []);
+    if (authenticated) {
+      router.push('/app');
+    }
+  }, [authenticated, router]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(resetError());
+    };
+  }, [dispatch]);
+
+  // const onSubmit = async (event) => {
+  //   event.preventDefault();
+    
+
+  //   dispatch(signup({ email, password }))
+  //     .unwrap()
+  //     .then(() => {
+  //       toast.success('Signup successful!', {
+  //         toastId: 'success-toast',
+  //       });
+  //     })
+  //     .catch(() => {
+  //       toast.error(error, { toastId: 'error-toast' });
+  //     });
+  // };
   const onSubmit = async (event) => {
     event.preventDefault();
-
-   
-    await signup(email, password, confirmPassword);
-    if (error) {
-      toast.error(error);
-    } else {
-      toast.success("Signup successful!");
+  
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match", { toastId: "error-toast" });
+      return;
     }
+  
+    dispatch(signup({ email, password }))
+      .unwrap()
+      .then(() => {
+        toast.success("Signup successful!", { toastId: "success-toast" });
+      })
+      .catch((err) => {
+        toast.error(err || error, { toastId: "error-toast" });
+      });
   };
+
   return (
     <Container
       className="h-screen flex flex-col justify-center items-center gap-4"
       maxWidth="sm"
     >
-      <form onSubmit={onSubmit} className="">
+      <form onSubmit={onSubmit}>
         <Box
           sx={{
-            width: "100%",
+            width: '100%',
             padding: 4,
             borderRadius: 1,
             boxShadow: 3,
-            bgcolor: "background.paper",
+            bgcolor: 'background.paper',
           }}
         >
           <Typography variant="h5" component="h1" gutterBottom>
-            Sign up to create an account.
+            Please sign up to continue.
           </Typography>
           {error && (
             <Typography variant="body2" color="error">
@@ -69,8 +100,8 @@ export default function SignupForm() {
             placeholder="Enter your email address"
             required
             variant="outlined"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
-
           />
           <TextField
             fullWidth
@@ -83,33 +114,32 @@ export default function SignupForm() {
             required
             variant="outlined"
             inputProps={{ minLength: 6 }}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
-
           />
           <TextField
             fullWidth
             margin="normal"
-            id="confirmPassword"
+            id="confirm-password"
             label="Confirm Password"
             type="password"
             name="confirmPassword"
-            placeholder="Confirm your password"
+            placeholder="Confirm password"
             required
             variant="outlined"
-            inputProps={{ minLength: 6 }}
+            value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-
           />
           <SignupButton loading={loading} />
         </Box>
 
         <MuiLink component={Link} href="/login" underline="none">
           <Typography variant="body2" color="textSecondary">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Typography
               component="span"
               fontWeight="fontWeightBold"
-              sx={{ textDecoration: "underline" }}
+              sx={{ textDecoration: 'underline' }}
             >
               Log in
             </Typography>
@@ -130,7 +160,7 @@ function SignupButton({ loading }) {
       disabled={loading}
       sx={{ mt: 3, mb: 2 }}
     >
-      {loading ? <CircularProgress size={24} /> : "Sign up"}
+      {loading ? <CircularProgress size={24} /> : 'Sign up'}
     </Button>
   );
 }

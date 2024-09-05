@@ -306,6 +306,8 @@ export default function ChatPanel({
 
   const handleSendWithImages = () => {
     handleSend(input, base64Images);
+
+
     setBase64Images([]);
     setImages([]);
     setInput(""); // Clear the textarea

@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // Adjust the import path as necessary
-
+import { useDispatch } from "react-redux";
+import { logout } from "../store/authSlice"; // Adjust the import path as necessary
+import { useRouter } from "next/router";
 function Header() {
+  const router= useRouter()
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuth();
+  const dispatch = useDispatch();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/login")
   };
 
   return (
@@ -36,7 +42,7 @@ function Header() {
           <Link className="hover:text-gray-400" href="/contact">
             Contact
           </Link>
-          <button onClick={logout} className="hover:text-gray-400">
+          <button onClick={handleLogout} className="hover:text-gray-400">
             Logout
           </button>
         </nav>
@@ -76,7 +82,7 @@ function Header() {
           <Link className="hover:text-gray-400" href="/contact">
             Contact
           </Link>
-          <button onClick={logout} className="hover:text-gray-400">
+          <button onClick={handleLogout} className="hover:text-gray-400">
             Logout
           </button>
         </nav>

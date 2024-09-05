@@ -1,47 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useSelector, useDispatch } from "react-redux";
+import { checkAuthAndSetState } from "../utils/authUtils";
 
 const PrivateRoute = (WrappedComponent) => {
   const Wrapper = (props) => {
-    const { state, fetchHistory } = useAuth();
+    const { authenticated } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-      const checkAuth = async () => {
-        const token = localStorage.getItem('token');
-        const email = localStorage.getItem('email');
-
-        if (token && email) {
-          try {
-            // Check if the token is valid by fetching user history
-              
-              await fetchHistory();
-            if (!state.authenticated) {
-              console.log(state,"if ke andr private route")
-              // window.location.href = "/login";
-            }
-          } catch (error) {
-            console.error('Authentication error:', error);
-            await router.push('/login');
-          }
-        } else {
-          console.log("else ke andr")
-          router.push('/login');
+      const checkAuthentication = async () => {
+        console.log(authenticated,"authenticated in login page")
+        const isAuthenticated = await checkAuthAndSetState(dispatch);
+        console.log(isAuthenticated, "isAuthenticated in private route");
+    
+        if (!isAuthenticated) {
+          router.push("/login");
         }
-
+    
         setLoading(false);
       };
-
-      checkAuth();
-    }, [state.authenticated,router,fetchHistory]);
+    
+      checkAuthentication();
+    }, [router, dispatch]); 
+    
 
     if (loading) {
       return <div>Loading...</div>; // Customize loading state as needed
     }
 
-    return state.authenticated ? <WrappedComponent {...props} /> : null;
+    return authenticated ? <WrappedComponent {...props} /> : null;
   };
 
   return Wrapper;
