@@ -11,7 +11,8 @@ import posthog from "../../lib/posthog";
 import CodeBlock from "../../components/code-block";
 import EmptyScreen from "../../components/empty-screen";
 import PrivateRoute from "../../layout/PrivateRoute";
-import { fetchHistory, setUserHistory } from "../../store/authSlice";
+import {  setUserHistory } from "../../store/authSlice";
+import {fetchHistory} from "../../utils/authUtils"
 import { FaBullseye } from "react-icons/fa6";
 
 const Chat = ({ id, className, session }) => {
