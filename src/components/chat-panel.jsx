@@ -1,266 +1,5 @@
 
 
-
-// import React, { useState, useEffect, useRef } from "react";
-// import {
-//   Container,
-//   Box,
-//   Button,
-//   CircularProgress,
-//   IconButton,
-// } from "@mui/material";
-
-// export default function ChatPanel({
-//   id,
-//   input,
-//   setInput,
-//   handleSend,
-//   sendingMessage,
-//   streaming,
-//   handleStopStreaming,
-// }) {
-//   const [images, setImages] = useState([]);
-//   const [base64Images, setBase64Images] = useState([]);
-//   const textareaRef = useRef(null);
-
-//   const handleImageUpload = (event) => {
-//     const files = Array.from(event.target.files);
-//     const newBase64Images = [];
-//     files.forEach((file) => {
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         newBase64Images.push(reader.result);
-//         if (newBase64Images.length === files.length) {
-//           setBase64Images((prevBase64Images) => [
-//             ...prevBase64Images,
-//             ...newBase64Images,
-//           ]);
-//         }
-//       };
-//       if (file) {
-//         reader.readAsDataURL(file);
-//         setImages((prevImages) => [...prevImages, URL.createObjectURL(file)]);
-//       }
-//     });
-//   };
-
-//   const handleSendWithImages = () => {
-//     handleSend(input, base64Images);
-//     setBase64Images([]);
-//     setImages([]);
-//   };
-
-//   useEffect(() => {
-//     base64Images.forEach((image, index) => {
-//       console.log(`Image ${index + 1}: ${image}`);
-//       // Send each image to the server or perform any other operations
-//     });
-//   }, [base64Images]);
-
-//   // Auto-resize textarea height
-//   useEffect(() => {
-//     if (textareaRef.current) {
-//       textareaRef.current.style.height = 'auto'; // Reset height
-//       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set height based on content
-//     }
-//   }, [input]);
-
-//   return (
-//     <Box
-//       sx={{
-//         position: "absolute",
-//         bottom: "10px",
-//         left: "50%",
-//         transform: "translateX(-50%)",
-//         maxWidth: "700px",
-//         minWidth: "600px",
-//         width: "100%",
-//         boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
-//         p: 2,
-//         backgroundColor: "#fff",
-//         borderRadius: "10px",
-//         border: "1px solid #e0e0e0", 
-//         display: "flex",
-//         // flexDirection: "column",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Container maxWidth="xl" className="px-0">
-//         <Box
-//           sx={{
-//             display: "flex",
-//             alignItems: "center",
-//             justifyContent:"space-between",
-//             flexDirection: "row",
-//           }}
-//         >
-//           <input
-//             type="file"
-//             hidden
-//             accept="image/*"
-//             multiple
-//             onChange={handleImageUpload}
-//             id="upload-image-input"
-//           />
-//           <Box sx={{  mr: 2 ,display:"flex", alignItems:"center",width:"100%"}}>
-//             <textarea
-//               ref={textareaRef}
-//               value={input}
-//               onChange={(e) => setInput(e.target.value)}
-//               placeholder="Type your message..."
-//               style={{
-//                 width: "100%",
-//                 minHeight: "40px",
-//                 maxHeight: "120px",
-//                 overflowY: "auto",
-//                 resize: "none",
-              
-//                 borderRadius: "4px",
-//                 padding: "8px",
-//                 boxSizing: "border-box",
-//                 fontSize: "16px",
-//                 lineHeight: "1.5",
-//                 fontFamily: "inherit",
-//                 outline:"none"
-//               }}
-//             />
-
-//              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-//           <input
-//             type="file"
-//             hidden
-//             accept="image/*"
-//             multiple
-//             onChange={handleImageUpload}
-//             id="upload-image-input"
-//           />
-//           <IconButton
-//             color="primary"
-//             component="label"
-//             htmlFor="upload-image-input"
-//             sx={{ mr: 1 }}
-//           >
-//             <svg
-//               width="24"
-//               height="24"
-//               viewBox="0 0 24 24"
-//               fill="none"
-//               xmlns="http://www.w3.org/2000/svg"
-//             >
-//               <path
-//                 d="M12 3L4 9H7V19H17V9H20L12 3Z"
-//                 fill="currentColor"
-//               />
-//               <path
-//                 d="M13 16V13H11V16H8L12 20L16 16H13Z"
-//                 fill="currentColor"
-//               />
-//             </svg>
-//           </IconButton>
-//           {sendingMessage ? (
-//             <CircularProgress size={24} />
-//           ) : streaming ? (
-//             <Button
-//               onClick={handleStopStreaming}
-//               variant="contained"
-//               color="secondary"
-//               startIcon={<StopIcon />}
-//             >
-//               Stop
-//             </Button>
-//           ) : (
-//             // <Button
-//             //   onClick={handleSendWithImages}
-//             //   variant="contained"
-//             //   color="primary"
-//             // >
-//             //   Send
-//             // </Button>
-//             <StreamButton
-//             onClick={handleSendWithImages}
-//             sx={{ ml: 1 }}
-//           />
-//           )}
-//         </Box>
-//           </Box>
-//           <Box sx={{ display: "flex", alignItems: "center" }}>
-//             {images.map((image, index) => (
-//               <Box
-//                 key={index}
-//                 component="img"
-//                 sx={{
-//                   height: 40,
-//                   width: 40,
-//                   borderRadius: "50%",
-//                   ml: index > 0 ? 1 : 0,
-//                   objectFit: "cover",
-//                 }}
-//                 src={image}
-//                 alt={`Uploaded ${index + 1}`}
-//               />
-//             ))}
-//           </Box>
-//         </Box>
-       
-//       </Container>
-//     </Box>
-//   );
-// }
-
-
-// function StreamButton({ onClick, sx }) {
-//   return (
-//     <Button
-//       onClick={onClick}
-//       variant="contained"
-//       color="primary"
-//       sx={{
-//         height: 40, // Fixed height
-//         minWidth: 40, // Fixed width to make it small
-//         borderRadius: 20, // Rounded button
-//         backgroundColor: "#007bff", // Blue background
-//         color: "#fff", // White text color
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         ...sx,
-//       }}
-//     >
-//       <svg
-//         width="20"
-//         height="20"
-//         viewBox="0 0 24 24"
-//         fill="none"
-//         xmlns="http://www.w3.org/2000/svg"
-//       >
-//         <path
-//           d="M12 2L4 10H8V20H16V10H20L12 2Z"
-//           fill="currentColor"
-//         />
-//       </svg>
-//     </Button>
-//   );
-// }
-
-// function StopIcon() {
-//   return (
-//     <svg
-//       width="24"
-//       height="24"
-//       viewBox="0 0 24 24"
-//       fill="none"
-//       xmlns="http://www.w3.org/2000/svg"
-//     >
-//       <path
-//         d="M6 6H18V18H6V6Z"
-//         fill="currentColor"
-//       />
-//     </svg>
-//   );
-// }
-
-
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
@@ -268,6 +7,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  inputAdornmentClasses,
 } from "@mui/material";
 
 export default function ChatPanel({
@@ -278,9 +18,11 @@ export default function ChatPanel({
   sendingMessage,
   streaming,
   handleStopStreaming,
+  handleInputChange
 }) {
   const [images, setImages] = useState([]);
   const [base64Images, setBase64Images] = useState([]);
+  const [newInput,setNewInput]= useState()
   const textareaRef = useRef(null);
 
   const handleImageUpload = (event) => {
@@ -367,8 +109,10 @@ export default function ChatPanel({
           <Box sx={{ mr: 2, display: "flex", alignItems: "center", width: "100%" }}>
             <textarea
               ref={textareaRef}
+              // value={input}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              // onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => handleInputChange(e)}
               placeholder="Type your message..."
               style={{
                 width: "100%",

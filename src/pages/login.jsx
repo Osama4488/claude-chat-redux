@@ -23,17 +23,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  // useEffect(() => {
-  //   // const isAuthenticated = checkAuthAndSetState(dispatch);
-  //   // if (isAuthenticated) {
-  //   //   router.push("/app");
-  //   // }
-  //   console.log(userState,"userState in login page")
-  //   console.log(authenticated,"authenticated in login page")
-  //   if (authenticated) {
-  //     router.push("/app");
-  //   }
-  // }, [authenticated, router,dispatch]);
+  
   useEffect(() => {
     const checkAuthStatus = async () => {
       const isAuthenticated = await checkAuthAndSetState(dispatch);
@@ -60,7 +50,7 @@ export default function LoginForm() {
         toast.success('Login successful!', {
           toastId: 'success-toast',
         });
-        // window.location.href = '/app';
+        window.location.href = '/app';
       })  
       .catch(() => {
         toast.error(error, { toastId: 'error-toast' });
