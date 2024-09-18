@@ -98,20 +98,23 @@ text-align: left;
   }
 
   /* Style for <precode> tag to look like a <pre><code> block */
-precode {
-  display: block;
-  background-color: #f4f4f4;
-  padding: 1rem;
-  border-radius: 4px;
-  font-family: 'Courier New', Courier, monospace;
-  overflow-x: auto; /* Horizontal scroll if content overflows */
-  white-space: pre-wrap; /* Wrap long lines */
-  color: #333;
-  line-height: 1.5; /* Better readability */
-  margin-bottom: 30px;
-  font-weight: 600;
-  min-width: 100%;
-}
+  precode {
+    display: block;
+    background-color: #f4f4f4;
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto; /* Horizontal scroll if content overflows */
+    white-space: pre-wrap; /* Wrap long lines */
+    color: #333;
+    line-height: 1.5; /* Better readability */
+    margin-bottom: 30px;
+    font-weight: 600;
+    min-width: 100%;
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+  }
+  
 
 /* Optional: Syntax highlighting */
 precode .keyword {
