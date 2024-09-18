@@ -68,7 +68,7 @@ const Chat = ({ id, className, session }) => {
         message: sanitizedInput,
       });
 
-      const apiUrl = `https://junaid121e2e-001-site1.ctempurl.com/api/ResponseGeneration/TextResponseGenerator`;
+      const apiUrl = `https://shabahat-001-site1.etempurl.com/api/ResponseGeneration/TextResponseGenerator`;
 
       const response = await fetch(apiUrl, {
         method: "POST",
