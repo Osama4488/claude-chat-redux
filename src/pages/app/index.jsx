@@ -116,25 +116,65 @@ const Chat = ({ id, className, session }) => {
   };
   
 
-  const handleSend = async () => {
-    if (input.trim() === "") {
-      toast.error("Input cannot be empty.");
-      return;
-    }
+  // const handleSend = async () => {
+  //   if (input.trim() === "") {
+  //     toast.error("Input cannot be empty.");
+  //     return;
+  //   }
 
-    setSelectedChat(null)
-    const sanitizedInput = input.trim();
-    setInput("");
-    setResponseStream([]);
+  //   setSelectedChat(null)
+  //   const sanitizedInput = input.trim();
+  //   setInput("");
+  //   setResponseStream([]);
 
-    // Send the sanitized input to the worker to fetch the response
-    workerRef.current.postMessage({
+  //   // Send the sanitized input to the worker to fetch the response
+  //   workerRef.current.postMessage({
+  //     type: "fetchResponse",
+  //     payload: { sanitizedInput, email: userState?.email },
+  //   });
+
+  //   setSendingMessage(true); // Set sending message state to true
+  // };
+  // In your app where you handle the chat send
+
+const handleSend = (sanitizedInput, email) => {
+  const worker =  new Worker("/Chat-Worker.js");
+  
+  // Start fetching chat response and history in parallel
+  // worker.postMessage({
+  //   type: 'fetchResponse',
+  //   payload: {
+  //     sanitizedInput,
+  //     email
+  //   }
+  // });
+     workerRef.current.postMessage({
       type: "fetchResponse",
       payload: { sanitizedInput, email: userState?.email },
     });
 
-    setSendingMessage(true); // Set sending message state to true
+  // Listen to the stream of chat messages and update UI
+  worker.onmessage = async (event) => {
+    const { type, payload } = event.data;
+
+    switch (type) {
+      case 'responseStream':
+        // Update the main chat window with the new message
+        appendToChatWindow(payload);
+        break;
+
+      case 'fetchHistory':
+        // Fetch and set the chat history when instructed by the worker
+        await fetchAndSetHistory(payload);
+        break;
+
+      default:
+        console.error("Unknown message type from worker:", type);
+        break;
+    }
   };
+};
+
 
   const handleSelectChat = (index) => {
     setSelectedChat(index);
