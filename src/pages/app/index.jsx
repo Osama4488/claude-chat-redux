@@ -11,12 +11,13 @@ import EmptyScreen from "../../components/empty-screen";
 import PrivateRoute from "../../layout/PrivateRoute";
 import { setUserHistory } from "../../store/authSlice";
 import { fetchHistory } from "../../utils/authUtils";
+import Cookies from 'js-cookie';
 
-import { FaBullseye } from "react-icons/fa6";
 
 const Chat = ({ id, className, session }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const accessToken = Cookies.get('accessToken');
   const chatHistory = useSelector(
     (state) => state.auth.user?.userHistory || []
   );
@@ -73,40 +74,24 @@ const Chat = ({ id, className, session }) => {
     }
   }, [selectedChat, chatHistory]);
 
-  // const fetchAndSetHistory = async (email) => {
-  //   try {
-  //     setChatHistoryLoads(true);
-
-  //     const historyData = await fetchHistory(email);
-  //     console.log(historyData, "historyData in fetchresponse");
-  //     dispatch(setUserHistory(historyData));
-  //   } catch (error) {
-  //     console.error("Error fetching user history:", error);
-  //     // Handle errors as needed
-  //   } finally {
-  //     setChatHistoryLoads(false);
-  //   }
-  // };
   const fetchAndSetHistory = async (email) => {
     try {
       setChatHistoryLoads(true);
-  
+
       const historyData = await fetchHistory(email);
       console.log(historyData, "historyData in fetchresponse");
-  
+
       // Dispatch the fetched history to Redux
       dispatch(setUserHistory(historyData));
-  
-      
-  
-       // Check if historyData is not empty
-    if (historyData.length > 0) {
-      // Set the selected chat to the last index
-      setSelectedChat(historyData.length - 1);
-    } else {
-      // Optionally handle the case where no history is found
-      setSelectedChat(null);
-    }
+
+      // Check if historyData is not empty
+      if (historyData.length > 0) {
+        // Set the selected chat to the last index
+        setSelectedChat(historyData.length - 1);
+      } else {
+        // Optionally handle the case where no history is found
+        setSelectedChat(null);
+      }
     } catch (error) {
       console.error("Error fetching user history:", error);
       // Handle errors as needed
@@ -114,71 +99,45 @@ const Chat = ({ id, className, session }) => {
       setChatHistoryLoads(false);
     }
   };
-  
 
-  // const handleSend = async () => {
-  //   if (input.trim() === "") {
-  //     toast.error("Input cannot be empty.");
-  //     return;
-  //   }
+  const handleSend = (sanitizedInput, email) => {
+    const worker = new Worker("/Chat-Worker.js");
+    setSelectedChat(null);
+    setInput("");
+    setResponseStream([]);
+    // Start fetching chat response and history in parallel
 
-  //   setSelectedChat(null)
-  //   const sanitizedInput = input.trim();
-  //   setInput("");
-  //   setResponseStream([]);
-
-  //   // Send the sanitized input to the worker to fetch the response
-  //   workerRef.current.postMessage({
-  //     type: "fetchResponse",
-  //     payload: { sanitizedInput, email: userState?.email },
-  //   });
-
-  //   setSendingMessage(true); // Set sending message state to true
-  // };
-  // In your app where you handle the chat send
-
-const handleSend = (sanitizedInput, email) => {
-  const worker =  new Worker("/Chat-Worker.js");
-  
-  // Start fetching chat response and history in parallel
-  // worker.postMessage({
-  //   type: 'fetchResponse',
-  //   payload: {
-  //     sanitizedInput,
-  //     email
-  //   }
-  // });
-     workerRef.current.postMessage({
+    workerRef.current.postMessage({
       type: "fetchResponse",
-      payload: { sanitizedInput, email: userState?.email },
+      payload: { sanitizedInput, email: userState?.email, token: accessToken,  },
     });
 
-  // Listen to the stream of chat messages and update UI
-  worker.onmessage = async (event) => {
-    const { type, payload } = event.data;
+    setSendingMessage(true);
+    // Listen to the stream of chat messages and update UI
+    worker.onmessage = async (event) => {
+      const { type, payload } = event.data;
 
-    switch (type) {
-      case 'responseStream':
-        // Update the main chat window with the new message
-        appendToChatWindow(payload);
-        break;
+      switch (type) {
+        case "responseStream":
+          // Update the main chat window with the new message
+          appendToChatWindow(payload);
+          break;
 
-      case 'fetchHistory':
-        // Fetch and set the chat history when instructed by the worker
-        await fetchAndSetHistory(payload);
-        break;
+        case "fetchHistory":
+          // Fetch and set the chat history when instructed by the worker
+          await fetchAndSetHistory(payload);
+          break;
 
-      default:
-        console.error("Unknown message type from worker:", type);
-        break;
-    }
+        default:
+          console.error("Unknown message type from worker:", type);
+          break;
+      }
+    };
   };
-};
 
-
-  const handleSelectChat = (index) => {
+  const handleSelectChat = useCallback((index) => {
     setSelectedChat(index);
-  };
+  }, []);
 
   const handleInputChange = useCallback(
     (e) => {
@@ -191,48 +150,94 @@ const handleSend = (sanitizedInput, email) => {
     <>
       <Header />
       <div
+        className="main-container"
         style={{
+          display: "flex",
           height: "calc(100vh - 60px)",
+          width: "100%",
         }}
-        className="w-full flex justify-between overflow-hidden"
       >
-        <Sidebar
-          chatHistory={chatHistory}
-          selectedChatIndex={selectedChat}
-          onSelectChat={handleSelectChat}
-          isLoading={chatHistoryLoads}
-        />
-
-        <Box
-          sx={{
-            flexGrow: 1,
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            height: "calc(100vh - 60px)",
-            overflowY: "scroll",
-            overflowX: "hidden",
+       
+        <div
+          className="sidebar-container"
+          style={{
+            width: "300px",
+            overflowY: "auto",
           }}
         >
-          {responseStream.length > 0 ? (
-            <div className="no-scrollbar">
-              <CodeBlock code={responseStream.join("")} />
-            </div>
-          ) : (
-            <EmptyScreen />
-          )}
-          <ChatPanel
-            input={input}
-            handleSend={handleSend}
-            sendingMessage={sendingMessage}
-            responseStream={responseStream}
-            setInput={setInput}
-            handleInputChange={handleInputChange}
+          <Sidebar
+            chatHistory={chatHistory}
+            selectedChatIndex={selectedChat}
+            onSelectChat={handleSelectChat}
+            isLoading={chatHistoryLoads}
           />
-        </Box>
+        </div>
+
+     
+        <div
+          className="chat-content-container"
+          style={{
+            flexGrow: 1,
+            position: "relative",
+            overflowY: "auto",
+            alignItems:"center"
+          }}
+        >
+          <Box
+            className="chat-content"
+            sx={{
+              flexGrow: 1,
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+              paddingBottom: "100px", 
+              
+            }}
+          >
+            {responseStream.length > 0 ? (
+              <div className="no-scrollbar">
+                <CodeBlock code={responseStream.join("")} />
+              </div>
+            ) : (
+              <EmptyScreen />
+            )}
+          </Box>
+
+        
+        
+           {/* Chat Panel fixed at the bottom */}
+           <Box
+  sx={{
+    position: "fixed", // Keep it fixed to stay at the bottom while scrolling
+    bottom: 0, // Stays at the bottom of the viewport
+    // left: "50%", // Horizontally centered in the viewport
+    // transform: "translateX(-50%)", // Ensure it's centered
+    width: "100%", // Takes full width
+    maxWidth: "700px", // Limit width to 700px
+    minWidth: "600px", // Minimum width constraint
+    p: 2,
+    backgroundColor: "#fff",
+    boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+    borderTop: "1px solid #e0e0e0",
+ 
+
+  }}
+>
+  <ChatPanel
+    input={input}
+    handleSend={handleSend}
+    sendingMessage={sendingMessage}
+    handleInputChange={handleInputChange}
+  />
+</Box>
+
+        </div>
       </div>
     </>
+
+  
+    
   );
 };
 

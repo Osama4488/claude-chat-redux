@@ -44,8 +44,12 @@ import axios from "axios";
 
 export const fetchHistory = async (email) => {
   try {
+    const accessToken = Cookies.get("accessToken");
     const historyResponse = await axios.get(process.env.NEXT_PUBLIC_HISTORY_URL, {
       params: { email },
+      headers: {
+        Authorization: `Bearer ${accessToken}`, 
+      },
     });
     return historyResponse.data;
   } catch (error) {
