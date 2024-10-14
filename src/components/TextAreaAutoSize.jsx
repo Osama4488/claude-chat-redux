@@ -28,4 +28,7 @@ const InputArea = memo(({ input, handleInputChange }) => {
   );
 });
 
+// Set displayName to remove the error
+InputArea.displayName = 'InputArea';
+
 export default InputArea;
