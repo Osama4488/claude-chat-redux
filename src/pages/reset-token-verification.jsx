@@ -85,7 +85,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 import axios from "axios";
 
 const PasswordForm = () => {
@@ -95,35 +95,36 @@ const PasswordForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
-  // Extract the email (u) and token (t) from the query parameters
-  const email = searchParams.get("u");
-  const token = searchParams.get("t");
+  const router = useRouter();
+  const { u: email, t: token } = router.query; // Destructure query parameters
+
+  console.log(email,token,"==")
 
   useEffect(() => {
-    // Verify the token as soon as the component mounts
-    const verifyToken = async () => {
-      try {
-        const response = await axios.post("http://localhost:5123/api/verify-token", {
-          email,
-          token,
-        });
+    if (email && token) {
+      // Verify the token as soon as the email and token are available
+      const verifyToken = async () => {
+        try {
+          const response = await axios.post("http://localhost:5123/api/verify-token", {
+            email,
+            token,
+          });
 
-        if (response.data.valid) {
-          setIsTokenValid(true);
-        } else {
-          setError("Invalid or expired token.");
+          if (response.data.valid) {
+            setIsTokenValid(true);
+          } else {
+            setError("Invalid or expired token.");
+          }
+        } catch (error) {
+          setError("Token verification failed. Please try again.");
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        setError("Token verification failed. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    verifyToken();
+      verifyToken();
+    }
   }, [email, token]);
 
   const handleSubmit = async (e) => {
@@ -148,7 +149,7 @@ const PasswordForm = () => {
       if (response.data.success) {
         setSuccessMessage("Password reset successfully!");
         // Optionally navigate to the login page or another page
-        setTimeout(() => navigate("/login"), 3000);
+        setTimeout(() => router.push("/login"), 3000);
       } else {
         setError("Password reset failed. Please try again.");
       }
