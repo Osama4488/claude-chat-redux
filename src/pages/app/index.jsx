@@ -14,6 +14,7 @@ import { fetchHistory } from "../../utils/authUtils";
 import Cookies from 'js-cookie';
 
 
+
 const Chat = ({ id, className, session }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
@@ -38,6 +39,13 @@ const Chat = ({ id, className, session }) => {
     } catch (error) {
       console.error("Error initializing worker:", error);
     }
+      // Cleanup function to terminate the worker when the component unmounts
+  return () => {
+    if (workerRef.current) {
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+  };
   }, []);
 
   // In the main thread
@@ -100,40 +108,80 @@ const Chat = ({ id, className, session }) => {
     }
   };
 
+  // const handleSend = (sanitizedInput, email) => {
+  //   const worker = new Worker("/Chat-Worker.js");
+  //   setSelectedChat(null);
+  //   setInput("");
+  //   setResponseStream([]);
+  //   // Start fetching chat response and history in parallel
+
+  //   workerRef.current.postMessage({
+  //     type: "fetchResponse",
+  //     payload: { sanitizedInput, email: userState?.email, token: accessToken,  },
+  //   });
+
+  //   setSendingMessage(true);
+  //   // Listen to the stream of chat messages and update UI
+  //   worker.onmessage = async (event) => {
+  //     const { type, payload } = event.data;
+
+  //     switch (type) {
+  //       case "responseStream":
+  //         // Update the main chat window with the new message
+  //         appendToChatWindow(payload);
+  //         break;
+
+  //       case "fetchHistory":
+  //         // Fetch and set the chat history when instructed by the worker
+  //         await fetchAndSetHistory(payload);
+  //         break;
+
+  //       default:
+  //         console.error("Unknown message type from worker:", type);
+  //         break;
+  //     }
+  //   };
+  // };
   const handleSend = (sanitizedInput, email) => {
+    // Check if the input is empty
+    if (!sanitizedInput.trim()) {
+      toast.error("Please write something before sending!"); // Show an error message
+      return; // Exit the function early
+    }
+  
     const worker = new Worker("/Chat-Worker.js");
     setSelectedChat(null);
-    setInput("");
-    setResponseStream([]);
+    setInput(""); // Clear input
+    setResponseStream([]); // Clear the response stream
+  
     // Start fetching chat response and history in parallel
-
     workerRef.current.postMessage({
       type: "fetchResponse",
-      payload: { sanitizedInput, email: userState?.email, token: accessToken,  },
+      payload: { sanitizedInput, email: userState?.email, token: accessToken },
     });
-
+  
     setSendingMessage(true);
+  
     // Listen to the stream of chat messages and update UI
     worker.onmessage = async (event) => {
       const { type, payload } = event.data;
-
+  
       switch (type) {
         case "responseStream":
-          // Update the main chat window with the new message
-          appendToChatWindow(payload);
+          setResponseStream((prev) => [...prev, ...payload.map((word) => `${word} `)]);
           break;
-
+  
         case "fetchHistory":
-          // Fetch and set the chat history when instructed by the worker
           await fetchAndSetHistory(payload);
           break;
-
+  
         default:
           console.error("Unknown message type from worker:", type);
           break;
       }
     };
   };
+  
 
   const handleSelectChat = useCallback((index) => {
     setSelectedChat(index);
